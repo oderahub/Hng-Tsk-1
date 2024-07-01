@@ -10,7 +10,6 @@ const port = process.env.PORT || 3000;
 
 app.set("trust proxy", true);
 
-app.use(express.json());
 app.use(requestIP.mw());
 
 app.get("/api/hello", async (req, res) => {
@@ -34,7 +33,6 @@ app.get("/api/hello", async (req, res) => {
     }
 
     const weatherData = await weatherResponse.json();
-    console.log(`Weather Data: ${JSON.stringify(weatherData)}`);
 
     const temperature = weatherData.current.temp_c;
     const location = weatherData.location.name;
