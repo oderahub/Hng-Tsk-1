@@ -8,6 +8,8 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
+app.use(express.json());
+
 // Tell Express to trust the first proxy in front of it
 app.set("trust proxy", true);
 
