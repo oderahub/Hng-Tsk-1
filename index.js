@@ -2,6 +2,7 @@ import express from "express";
 import requestIP from "request-ip";
 import fetch from "node-fetch";
 import dotenv from "dotenv";
+import cors from "cors";
 
 dotenv.config();
 
@@ -9,17 +10,33 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.set("trust proxy", true);
-
+app.use(cors());
 app.use(requestIP.mw());
 
 app.get("/api/hello", async (req, res) => {
-  const visitorName = req.query.visitor_name;
+  const visitorName = req.query.visitor_name || "Guest";
   const clientIp = req.clientIp;
   const apiKey = process.env.WEATHER_API_KEY;
 
+  console.log(`Client IP: ${clientIp}`);
+
   try {
+    // Get location data using IP
+    const locationResponse = await fetch(`https://ipapi.co/${clientIp}/json/`);
+    if (!locationResponse.ok) {
+      throw new Error(
+        `Failed to fetch location data: ${locationResponse.statusText}`
+      );
+    }
+
+    const locationData = await locationResponse.json();
+    const city = locationData.city || "Unknown";
+
+    console.log(`Location Data: ${JSON.stringify(locationData)}`);
+
+    // Get weather data using city
     const weatherResponse = await fetch(
-      `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${clientIp}`
+      `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}`
     );
 
     console.log(`Weather API Response Status: ${weatherResponse.status}`);
