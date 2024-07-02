@@ -7,7 +7,7 @@ import cors from "cors";
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 
 app.set("trust proxy", true);
 app.use(cors());
@@ -15,7 +15,13 @@ app.use(requestIP.mw());
 
 app.get("/api/hello", async (req, res) => {
   const visitorName = req.query.visitor_name || "Guest";
-  const clientIp = req.clientIp;
+  let clientIp = req.clientIp;
+
+  // Handle IPv6 localhost and IPv4 localhost
+  if (clientIp === "::1" || clientIp === "127.0.0.1") {
+    clientIp = "41.76.192.41"; // Use a public IP for testing purposes locally
+  }
+
   const apiKey = process.env.WEATHER_API_KEY;
 
   console.log(`Client IP: ${clientIp}`);
@@ -30,6 +36,10 @@ app.get("/api/hello", async (req, res) => {
     }
 
     const locationData = await locationResponse.json();
+    if (locationData.error) {
+      throw new Error(`Failed to fetch location data: ${locationData.reason}`);
+    }
+
     const city = locationData.city || "Unknown";
 
     console.log(`Location Data: ${JSON.stringify(locationData)}`);
