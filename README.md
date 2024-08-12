@@ -11,3 +11,6 @@ Response:
 }
 
 
+#  API = "http://api.weatherapi.com/v1/current.json"
+
+WEATHER_API_KEY= "c93eda497aa94507bf9103653240107"
